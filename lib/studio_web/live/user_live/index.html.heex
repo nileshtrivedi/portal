@@ -1,0 +1,48 @@
+<p class="mb-8">
+  User schema is just (id UUID, metadata JSON). Auth will be delegated to an external service like logto.io. ID may
+  include markers for is_email_verified, is_phone_verified. Even username will be stored in metadata so that
+  portal-specific policies can be enforced via permissions table.
+  <a class="underline" href="/">Back</a>
+</p>
+
+<.header>
+  Listing Users
+  <:actions>
+    <.link patch={~p"/users/new"}>
+      <.button>New User</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="users"
+  rows={@streams.users}
+  row_click={fn {_id, user} -> JS.navigate(~p"/users/#{user}") end}
+>
+  <:col :let={{_id, user}} label="Metadata"><%= inspect(user.metadata) %></:col>
+  <:action :let={{_id, user}}>
+    <div class="sr-only">
+      <.link navigate={~p"/users/#{user}"}>Show</.link>
+    </div>
+    <.link patch={~p"/users/#{user}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, user}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: user.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="user-modal" show on_cancel={JS.patch(~p"/users")}>
+  <.live_component
+    module={StudioWeb.UserLive.FormComponent}
+    id={@user.id || :new}
+    title={@page_title}
+    action={@live_action}
+    user={@user}
+    patch={~p"/users"}
+  />
+</.modal>

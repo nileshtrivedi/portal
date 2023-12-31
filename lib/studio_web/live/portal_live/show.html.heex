@@ -1,0 +1,35 @@
+<.header>
+  <%= @portal.display_name %>
+  <:subtitle>This is a portal record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/portals/#{@portal}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit portal</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Id"><%= @portal.id %></:item>
+  <:item title="Display name"><%= @portal.display_name %></:item>
+  <:item title="Type"><%= @portal.type %></:item>
+  <:item title="Slug"><%= @portal.slug %></:item>
+  <:item title="Fields"><%= inspect(@portal.fields) %></:item>
+</.list>
+
+<.back navigate={~p"/portals"}>Back to portals</.back>
+
+<.modal
+  :if={@live_action == :edit}
+  id="portal-modal"
+  show
+  on_cancel={JS.patch(~p"/portals/#{@portal}")}
+>
+  <.live_component
+    module={StudioWeb.PortalLive.FormComponent}
+    id={@portal.id}
+    title={@page_title}
+    action={@live_action}
+    portal={@portal}
+    patch={~p"/portals/#{@portal}"}
+  />
+</.modal>

@@ -1,0 +1,28 @@
+<.header>
+  Permission <%= @permission.id %>
+  <:subtitle>This is a permission record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/permissions/#{@permission}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit permission</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Scope"><%= @permission.scope %></:item>
+  <:item title="Action"><%= @permission.action %></:item>
+  <:item title="Criteria"><%= @permission.criteria %></:item>
+</.list>
+
+<.back navigate={~p"/permissions"}>Back to permissions</.back>
+
+<.modal :if={@live_action == :edit} id="permission-modal" show on_cancel={JS.patch(~p"/permissions/#{@permission}")}>
+  <.live_component
+    module={StudioWeb.PermissionLive.FormComponent}
+    id={@permission.id}
+    title={@page_title}
+    action={@live_action}
+    permission={@permission}
+    patch={~p"/permissions/#{@permission}"}
+  />
+</.modal>

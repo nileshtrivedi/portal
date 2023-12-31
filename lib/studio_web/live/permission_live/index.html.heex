@@ -1,0 +1,43 @@
+<.header>
+  Listing Permissions
+  <:actions>
+    <.link patch={~p"/permissions/new"}>
+      <.button>New Permission</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="permissions"
+  rows={@streams.permissions}
+  row_click={fn {_id, permission} -> JS.navigate(~p"/permissions/#{permission}") end}
+>
+  <:col :let={{_id, permission}} label="Scope"><%= permission.scope %></:col>
+  <:col :let={{_id, permission}} label="Action"><%= permission.action %></:col>
+  <:col :let={{_id, permission}} label="Criteria"><%= permission.criteria %></:col>
+  <:action :let={{_id, permission}}>
+    <div class="sr-only">
+      <.link navigate={~p"/permissions/#{permission}"}>Show</.link>
+    </div>
+    <.link patch={~p"/permissions/#{permission}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, permission}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: permission.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="permission-modal" show on_cancel={JS.patch(~p"/permissions")}>
+  <.live_component
+    module={StudioWeb.PermissionLive.FormComponent}
+    id={@permission.id || :new}
+    title={@page_title}
+    action={@live_action}
+    permission={@permission}
+    patch={~p"/permissions"}
+  />
+</.modal>

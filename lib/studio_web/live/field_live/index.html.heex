@@ -1,0 +1,54 @@
+<p class="mb-8">
+  Inspired by "Custom Profile Fields", this allows extreme flexibility for portal admins to customize their portal without
+  having to change the code. <a class="underline" href="/">Back</a>
+</p>
+
+<.header>
+  Listing Fields
+  <:actions>
+    <.link patch={~p"/fields/new"}>
+      <.button>New Field</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="fields"
+  rows={@streams.fields}
+  row_click={fn {_id, field} -> JS.navigate(~p"/fields/#{field}") end}
+>
+  <:col :let={{_id, field}} label="Name"><%= field.name %></:col>
+  <:col :let={{_id, field}} label="Scope"><%= field.scope %></:col>
+  <:col :let={{_id, field}} label="Type"><%= field.type %></:col>
+  <:col :let={{_id, field}} label="Is required"><%= field.is_required %></:col>
+  <:action :let={{_id, field}}>
+    <div class="sr-only">
+      <.link navigate={~p"/fields/#{field}"}>Show</.link>
+    </div>
+    <.link patch={~p"/fields/#{field}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, field}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: field.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="field-modal"
+  show
+  on_cancel={JS.patch(~p"/fields")}
+>
+  <.live_component
+    module={StudioWeb.FieldLive.FormComponent}
+    id={@field.id || :new}
+    title={@page_title}
+    action={@live_action}
+    field={@field}
+    patch={~p"/fields"}
+  />
+</.modal>

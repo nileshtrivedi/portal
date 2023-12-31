@@ -1,0 +1,59 @@
+<p class="mb-8">
+  Portals are hierarchical spaces with members and content (think groups and sub-groups). Portal type can be "container"
+  if it has children portals or one of these: chat, posts, events, members, course. This allows 3 different concepts
+  from circle.so to be merged into a single one: Communities, Space groups, and Spaces.
+
+  The top-level portal may be deployed to slug.website.com rather than website.com/slug. Portals can also have custom
+  fields whose visibility and access are controlled via permissions.
+  <a class="underline" href="/">Back</a>
+</p>
+
+<.header>
+  Listing Portals
+  <:actions>
+    <.link patch={~p"/portals/new"}>
+      <.button>New Portal</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="portals"
+  rows={@streams.portals}
+  row_click={fn {_id, portal} -> JS.navigate(~p"/portals/#{portal}") end}
+>
+  <:col :let={{_id, portal}} label="Display name"><%= portal.display_name %></:col>
+  <:col :let={{_id, portal}} label="Type"><%= portal.type %></:col>
+  <:col :let={{_id, portal}} label="Slug"><%= portal.slug %></:col>
+  <:col :let={{_id, portal}} label="Fields"><%= inspect(portal.fields) %></:col>
+  <:action :let={{_id, portal}}>
+    <div class="sr-only">
+      <.link navigate={~p"/portals/#{portal}"}>Show</.link>
+    </div>
+    <.link patch={~p"/portals/#{portal}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, portal}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: portal.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="portal-modal"
+  show
+  on_cancel={JS.patch(~p"/portals")}
+>
+  <.live_component
+    module={StudioWeb.PortalLive.FormComponent}
+    id={@portal.id || :new}
+    title={@page_title}
+    action={@live_action}
+    portal={@portal}
+    patch={~p"/portals"}
+  />
+</.modal>

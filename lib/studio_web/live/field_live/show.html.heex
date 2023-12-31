@@ -1,0 +1,29 @@
+<.header>
+  Field <%= @field.id %>
+  <:subtitle>This is a field record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/fields/#{@field}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit field</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @field.name %></:item>
+  <:item title="Scope"><%= @field.scope %></:item>
+  <:item title="Type"><%= @field.type %></:item>
+  <:item title="Is required"><%= @field.is_required %></:item>
+</.list>
+
+<.back navigate={~p"/fields"}>Back to fields</.back>
+
+<.modal :if={@live_action == :edit} id="field-modal" show on_cancel={JS.patch(~p"/fields/#{@field}")}>
+  <.live_component
+    module={StudioWeb.FieldLive.FormComponent}
+    id={@field.id}
+    title={@page_title}
+    action={@live_action}
+    field={@field}
+    patch={~p"/fields/#{@field}"}
+  />
+</.modal>
